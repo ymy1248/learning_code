@@ -17,8 +17,14 @@
 
 using namespace boost;
 
-template <class Graph> struct exercise_vertex {
+// functor 用于使用到每一个vertex上，用functor的原因是为了存下Graph，每次使用都需要用。
+template <class Graph> 
+struct exercise_vertex {
   exercise_vertex(Graph& g_, const char name_[]) : g(g_),name(name_) { }
+  // To be precise, we do not deal with actual vertex objects, but rather with vertex descriptors. 
+  // Many graph representations (such as adjacency lists) do not store actual vertex objects, while 
+  // others do (e.g., pointer-linked graphs). This difference is hidden underneath the "black-box" 
+  // of the vertex descriptor object
   typedef typename graph_traits<Graph>::vertex_descriptor Vertex;
   void operator()(const Vertex& v) const
   {
@@ -54,6 +60,7 @@ template <class Graph> struct exercise_vertex {
     std::cout << std::endl;
 
     // Write out all adjacent vertices
+    // 只在意vertices而不在意edges，利用adjacent_ver就好
     std::cout << "\tadjacent vertices: ";
     typename graph_traits<Graph>::adjacency_iterator ai, ai_end;
     for (boost::tie(ai,ai_end) = adjacent_vertices(v, g);  ai != ai_end; ++ai)
@@ -73,7 +80,9 @@ int main(int,char*[])
                          vecS,                  // determine datastructure of the graph's vertex set
                          bidirectionalS,        // selectes a directed graph that provides access to both out and in-edges
                                                 // orther option: directedS, undirectedS
+                                                // NOTE: bidrectional cost more memory
                          no_property,  
+                         // internal property which is stored inside graph
                          property<edge_weight_t, float> > Graph;
 
   // Make convenient labels for the vertices
@@ -114,21 +123,29 @@ int main(int,char*[])
     trans_delay = get(edge_weight, g);
 
   std::cout << "vertices(g) = ";
-  // 用graph_traints
+  // 用graph_traints 获得iterator，因为iterator依托于Graph，所以用上traits
   typedef graph_traits<Graph>::vertex_iterator vertex_iter;
   std::pair<vertex_iter, vertex_iter> vp;
   // NOTE: vertices returns std::pair of vertex iterators
-  for (vp = vertices(g); vp.first != vp.second; ++vp.first)
+  // the first iterator points to the "beginning" of the vertices and the second iterator points "past the end"
+  // vertex_id is a property_map which is for property query
+  for (vp = vertices(g); vp.first != vp.second; ++vp.first) {
     std::cout << name[get(vertex_id, *vp.first)] <<  " ";
+  }
+  std::cout << std::endl;
+  std::cout << "The end of vertex :" << *vp.second << " ";
   std::cout << std::endl;
 
   std::cout << "edges(g) = ";
   graph_traits<Graph>::edge_iterator ei, ei_end;
+  // 利用tie来分别赋值，给ei 和 ei_end。
+  // TODO ? 好处是什么？为什么不让verteices也一样?
   for (boost::tie(ei,ei_end) = edges(g); ei != ei_end; ++ei)
     std::cout << "(" << name[get(vertex_id, source(*ei, g))]
               << "," << name[get(vertex_id, target(*ei, g))] << ") ";
   std::cout << std::endl;
 
+  // 把一个functor用在每一个vetices上
   std::for_each(vertices(g).first, vertices(g).second,
                 exercise_vertex<Graph>(g, name));
 
