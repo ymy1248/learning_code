@@ -7,7 +7,7 @@
 - **APUE**：以代码注释的方式学习。
 
 ## 代码链接
-[Effective C++](https://github.com/ymy1248/learning_code/tree/master/c%2B%2B/effective_c%2B%2B)![Progress](http://progressed.io/bar/20?title=progress)
+[Effective C++](https://github.com/ymy1248/learning_code/tree/master/c%2B%2B/effective_c%2B%2B)![Progress](http://progressed.io/bar/10?title=progress)
 
 [Effective modern C++](https://github.com/ymy1248/learning_code/tree/master/c%2B%2B/emc)![Progress](http://progressed.io/bar/10?title=progress)
 
