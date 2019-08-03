@@ -12,6 +12,9 @@ void fPtr(T* param) {}
 template <typename T>
 void fUR(T&& param) {}
 
+template <typename T>
+void f(T param) {}
+
 int main()
 {
   int x = 27;
@@ -40,4 +43,15 @@ int main()
                     // params's type is also const int&
   fUR(27);          // 27 is rvalue, so T is int,
                     // param's type is therefore int&&
+                    
+  f(x);             // for these three functions T and param are both int
+  f(cx);
+  f(rx);
+
+  const char* const ptr = "Fun with pointers";
+
+  f(ptr);           // passed-by value, will be const char*
+
+  const char name[] = "Fun";
+  fRef(name);       // T is const char[3], param is const char(&)[3]
 }
