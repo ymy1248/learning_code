@@ -42,6 +42,8 @@ int main (){
   list<int> l;
   auto it_l = l.begin();
   auto it = nums.begin();
+  // the key point of using traits is overloading the template function and let compiler choose the 
+  // best function for you.
   advance(it, 10);
   advance(it_l, 10);
   advance(it_l, 10, iterator_traits<list<int>::iterator>::iterator_category());

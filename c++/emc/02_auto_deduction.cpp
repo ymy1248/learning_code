@@ -2,6 +2,9 @@
 
 using namespace std;
 
+template<typename T>
+void func(T param);
+
 int main() {
   // these three auto types act like template function T
   // three cases:
@@ -24,9 +27,13 @@ int main() {
 
   auto x1 = 27;             // type is int, value is 27
   auto x2(27);              // ditto
+  // NOTE: bear this in mind in case of something special
   auto x3 = {27};           // type is std::initializer_list<int>
   auto x4 {27};             // ditto
+  // auto x5 = {1,2,3.0};   // error due to different type, can't be converted to initializer_list
+  
+  // this is different with template deduction, auto-deduction can be deducted to initializer_list 
+  // while template can't
+  // func({11, 23, 9});     // error
 }
 
-void func(int, double) {
-}
