@@ -1,7 +1,9 @@
 #include <iostream>
 #include <thread>
+#include <memory>
 
 using namespace std;
+using MuxGuard = std::lock_guard<std::mutex>;
 
 void func(int) {
   cout << "call func(int)" << endl;
@@ -22,9 +24,20 @@ void *func() {
 class Widget{
 };
 
-int f1(std::shared_ptr<Widget> spw);
-int f2(std::unique_ptr<Widget> upw);
-bool f3(Widget *pw);
+int f1(std::shared_ptr<Widget> spw) { return 0; }
+int f2(std::unique_ptr<Widget> upw) { return 0; }
+bool f3(Widget *pw) { return false; }
+
+template<typename Func,
+         typename Mux,
+         typename Ptr>
+decltype(auto) lockAndCall(Func func,
+                           Mux &mutex,
+                           Ptr ptr)
+{
+  MuxGuard g(mutex);
+  return func(ptr);
+}
 
 int main()
 {
@@ -45,9 +58,20 @@ int main()
   }
 
   std::mutex f1m, f2m, f3m;
-  using MuxGuard = std::lock_guard<std::mutex>;
   {
     MuxGuard g(f1m);
     auto result = f1(0);
   }
+  {
+    MuxGuard g(f2m);
+    auto result = f2(NULL);
+  }
+  {
+    MuxGuard g(f3m);
+    auto result = f3(nullptr);
+  }
+  // TODO why error?
+  // auto result1 = lockAndCall(f1, f1m, 0);        // error
+  // auto result2 = lockAndCall(f2, f2m, NULL);     // error
+  auto result3 = lockAndCall(f3, f3m, nullptr);
 }
